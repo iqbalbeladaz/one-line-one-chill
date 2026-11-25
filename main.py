@@ -17,6 +17,7 @@ from pathlib import Path
 ENTRY = "The baby monitor crackled, and in my own voice it whispered, 'Don't come in \u2014 I'm already holding him.'"
 
 MAX_CHARS = 200
+SENTENCE_END = ".!?"
 
 
 def entry_text() -> str:
@@ -25,6 +26,13 @@ def entry_text() -> str:
         raise ValueError(f"entry is {len(ENTRY)} chars, must be 1-{MAX_CHARS}")
     if ENTRY.strip() != ENTRY or "\n" in ENTRY or not ENTRY.strip():
         raise ValueError("entry must be one clean, non-empty line")
+    # The bounty is one sentence: exactly one sentence-terminating mark,
+    # and it must be the last character (allowing a closing quote after it,
+    # as in ...him.').
+    body = ENTRY[:-1] if ENTRY[-1] in "'\"" else ENTRY
+    terminators = [c for c in body if c in SENTENCE_END]
+    if len(terminators) != 1 or body[-1] not in SENTENCE_END:
+        raise ValueError("entry must be exactly one sentence")
     return ENTRY
 
 
